@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "type": "micro",
+    "rows": 300,
+    "batch": 100,
+    "warmup": 20,
+    "vusers": 8,
+    "api_duration_s": 30,
+    "serverless_max_ops": 300,
+    "tessera_backend": "aws",
+    "tessera_backend_label": "S3DynamoBackend via real AWS",
+    "tessera_publish_mode": "windowed",
+    "tessera_publish_every_s": 2.0,
+    "tessera_backend_ops": {
+      "tessera-hot": {
+        "puts_total": 8,
+        "puts_by_key": {
+          "manifest": 3,
+          "history": 2,
+          "delta": 1,
+          "chunk": 1,
+          "snapshot": 1,
+          "other": 0
+        },
+        "publishes": 3,
+        "gets": 5,
+        "heads": 2,
+        "deletes": 0,
+        "commits": 963,
+        "puts_per_commit": 0.0083,
+        "publishes_per_commit": 0.0031
+      }
+    },
+    "generated_unix_s": 1791428466.07
+  },
+  "tessera_only": {
+    "cold_first_query_vfs_ms": 2312.393
+  },
+  "api": {},
+  "tessera-hot": {
+    "insert_row": {
+      "p50": 0.6811569910496473,
+      "p95": 0.8118670084513724,
+      "ops_s": 1441.0423775362246,
+      "n": 300
+    },
+    "insert_batch": {
+      "p50": 69.8001499986276,
+      "p95": 71.62431202596053,
+      "ops_s": 1443.2649932438344,
+      "n": 300
+    },
+    "point_select": {
+      "p50": 0.6081769824959338,
+      "p95": 0.7467769901268184,
+      "ops_s": 1604.0685848118997,
+      "n": 300
+    },
+    "update_row": {
+      "p50": 0.675976974889636,
+      "p95": 0.8240760071203113,
+      "ops_s": 1359.646836932715,
+      "n": 300
+    }
+  }
+}

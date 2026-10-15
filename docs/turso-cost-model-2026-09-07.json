@@ -1,0 +1,212 @@
+{
+  "date": "2026-09-07",
+  "aws_requests": 0,
+  "assumptions": "USD marginal request cost; no free tier, retries, lifecycle, storage, compute or network unless explicitly shown; head/lease <=1KiB",
+  "prices": {
+    "ddb_wru_per_million": 0.625,
+    "ddb_rru_per_million": 0.125,
+    "s3_put_per_million": 5.0,
+    "s3_gb_month": 0.023,
+    "express_put_per_million": 1.13,
+    "express_gb_month": 0.11,
+    "express_upload_gb": 0.0032,
+    "express_retrieval_gb": 0.0006,
+    "r2_class_a_per_million": 4.5,
+    "b2_standard_api": 0,
+    "b2_tb_month": 6.95,
+    "aws_egress_gb_assumption": 0.09
+  },
+  "publication_options": {
+    "current": 8.25,
+    "combined_head": 5.625,
+    "b2_combined_head_excluding_network": 0.625,
+    "r2_combined_head_excluding_network": 5.125,
+    "express_combined_head_excluding_bytes": 1.755
+  },
+  "ddb_journal": [
+    {
+      "total_delta_item_bytes": 512,
+      "usd_per_million_batches": 2.5
+    },
+    {
+      "total_delta_item_bytes": 1024,
+      "usd_per_million_batches": 2.5
+    },
+    {
+      "total_delta_item_bytes": 2048,
+      "usd_per_million_batches": 3.75
+    },
+    {
+      "total_delta_item_bytes": 3072,
+      "usd_per_million_batches": 5.0
+    },
+    {
+      "total_delta_item_bytes": 4096,
+      "usd_per_million_batches": 6.25
+    },
+    {
+      "total_delta_item_bytes": 16384,
+      "usd_per_million_batches": 21.25
+    },
+    {
+      "total_delta_item_bytes": 65536,
+      "usd_per_million_batches": 81.25
+    }
+  ],
+  "batching": [
+    {
+      "rate_per_second": 0.38580246913580246,
+      "window_ms": 5,
+      "mean_operations_per_batch": 1.001929,
+      "combined_head_usd_per_million_ops": 5.61417
+    },
+    {
+      "rate_per_second": 0.38580246913580246,
+      "window_ms": 25,
+      "mean_operations_per_batch": 1.009645,
+      "combined_head_usd_per_million_ops": 5.571265
+    },
+    {
+      "rate_per_second": 0.38580246913580246,
+      "window_ms": 100,
+      "mean_operations_per_batch": 1.03858,
+      "combined_head_usd_per_million_ops": 5.416048
+    },
+    {
+      "rate_per_second": 10,
+      "window_ms": 5,
+      "mean_operations_per_batch": 1.05,
+      "combined_head_usd_per_million_ops": 5.357143
+    },
+    {
+      "rate_per_second": 10,
+      "window_ms": 25,
+      "mean_operations_per_batch": 1.25,
+      "combined_head_usd_per_million_ops": 4.5
+    },
+    {
+      "rate_per_second": 10,
+      "window_ms": 100,
+      "mean_operations_per_batch": 2.0,
+      "combined_head_usd_per_million_ops": 2.8125
+    },
+    {
+      "rate_per_second": 100,
+      "window_ms": 5,
+      "mean_operations_per_batch": 1.5,
+      "combined_head_usd_per_million_ops": 3.75
+    },
+    {
+      "rate_per_second": 100,
+      "window_ms": 25,
+      "mean_operations_per_batch": 3.5,
+      "combined_head_usd_per_million_ops": 1.607143
+    },
+    {
+      "rate_per_second": 100,
+      "window_ms": 100,
+      "mean_operations_per_batch": 11.0,
+      "combined_head_usd_per_million_ops": 0.511364
+    },
+    {
+      "rate_per_second": 1000,
+      "window_ms": 5,
+      "mean_operations_per_batch": 6.0,
+      "combined_head_usd_per_million_ops": 0.9375
+    },
+    {
+      "rate_per_second": 1000,
+      "window_ms": 25,
+      "mean_operations_per_batch": 25.684827,
+      "combined_head_usd_per_million_ops": 0.219001
+    },
+    {
+      "rate_per_second": 1000,
+      "window_ms": 100,
+      "mean_operations_per_batch": 32.0,
+      "combined_head_usd_per_million_ops": 0.175781
+    }
+  ],
+  "b2_from_aws": [
+    {
+      "mean_uploaded_kib": 4,
+      "egress_gib_per_million_batches": 3.814697265625,
+      "usd_requests_plus_egress": 0.968323
+    },
+    {
+      "mean_uploaded_kib": 16,
+      "egress_gib_per_million_batches": 15.2587890625,
+      "usd_requests_plus_egress": 1.998291
+    },
+    {
+      "mean_uploaded_kib": 32,
+      "egress_gib_per_million_batches": 30.517578125,
+      "usd_requests_plus_egress": 3.371582
+    },
+    {
+      "mean_uploaded_kib": 64,
+      "egress_gib_per_million_batches": 61.03515625,
+      "usd_requests_plus_egress": 6.118164
+    },
+    {
+      "mean_uploaded_kib": 256,
+      "egress_gib_per_million_batches": 244.140625,
+      "usd_requests_plus_egress": 22.597656
+    }
+  ],
+  "b2_break_even_mean_kib": 58.254,
+  "shared_pack": [
+    {
+      "groups_per_pack": 2,
+      "independent_heads_usd_per_million_group_batches": 3.75,
+      "shared_shard_head_usd_per_million_group_batches": 2.8125
+    },
+    {
+      "groups_per_pack": 8,
+      "independent_heads_usd_per_million_group_batches": 1.875,
+      "shared_shard_head_usd_per_million_group_batches": 0.703125
+    },
+    {
+      "groups_per_pack": 32,
+      "independent_heads_usd_per_million_group_batches": 1.40625,
+      "shared_shard_head_usd_per_million_group_batches": 0.17578125
+    }
+  ],
+  "retention_floor": [
+    {
+      "database_mib": 1,
+      "publications": 1000000,
+      "full_rebase_objects": 111111,
+      "retained_rebase_gib": 108.5068359375,
+      "usd_if_all_rebases_held_one_full_month": 2.4957
+    },
+    {
+      "database_mib": 10,
+      "publications": 1000000,
+      "full_rebase_objects": 111111,
+      "retained_rebase_gib": 1085.068359375,
+      "usd_if_all_rebases_held_one_full_month": 24.9566
+    },
+    {
+      "database_mib": 64,
+      "publications": 1000000,
+      "full_rebase_objects": 111111,
+      "retained_rebase_gib": 6944.4375,
+      "usd_if_all_rebases_held_one_full_month": 159.7221
+    }
+  ],
+  "illustrative_fixed_cost_break_even": [
+    {
+      "additional_monthly_usd": 10,
+      "batches_at_combined_head_cost": 1777778
+    },
+    {
+      "additional_monthly_usd": 30,
+      "batches_at_combined_head_cost": 5333333
+    },
+    {
+      "additional_monthly_usd": 100,
+      "batches_at_combined_head_cost": 17777778
+    }
+  ]
+}

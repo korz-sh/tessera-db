@@ -1,0 +1,36 @@
+title: tessera-db
+description: One complete SQLite per tenant on S3, with real transactions and real SQL.
+remote_theme: just-the-docs/just-the-docs@v0.10.1
+color_scheme: dark
+
+url: "https://korz-sh.github.io"
+baseurl: "/tessera-db"
+
+# GH Pages populates site.github.* (including .releases for the changelog
+# page) via this plugin — it is whitelisted, no Gemfile entry needed.
+plugins:
+  - jekyll-github-metadata
+
+search_enabled: true
+heading_anchors: true
+
+# Mermaid is loaded through _includes/head_custom.html (CDN); fenced
+# ```mermaid blocks get a <pre class="mermaid"> wrapper by mermaid_config.
+mermaid:
+  version: "10.9.1"
+
+compress_html:
+  clippings: all
+  comments: all
+  endings: all
+  startings: all
+  blanklines: all
+  profile: false
+
+nav_external_links:
+  - title: Repository
+    url: https://github.com/korz-sh/tessera-db
+  - title: Releases
+    url: https://github.com/korz-sh/tessera-db/releases
+
+footer_content: "Apache-2.0 — tessera-db"

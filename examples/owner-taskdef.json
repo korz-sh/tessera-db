@@ -1,0 +1,41 @@
+{
+  "family": "tessera-owner",
+  "requiresCompatibilities": ["FARGATE"],
+  "networkMode": "awsvpc",
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "${EXECUTION_ROLE_ARN}",
+  "taskRoleArn": "${TASK_ROLE_ARN}",
+  "containerDefinitions": [
+    {
+      "name": "owner",
+      "image": "${IMAGE_URI}",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "TESSERA_TENANT", "value": "demo" },
+        { "name": "TESSERA_BUCKET", "value": "tessera-prod-store-ACCOUNT" },
+        { "name": "TESSERA_TABLE", "value": "tessera-prod-leases" },
+        { "name": "TESSERA_REGION", "value": "us-east-1" },
+        { "name": "TESSERA_TTL_MS", "value": "30000" },
+        { "name": "TESSERA_PUBLISH_EVERY_S", "value": "1.0" },
+        { "name": "TESSERA_IDLE_S", "value": "300" },
+        { "name": "TESSERA_COMPACT_EVERY_S", "value": "60" }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/aws/ecs/tessera-owner",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "owner"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+{
+  "meta": {
+    "type": "micro",
+    "rows": 300,
+    "batch": 100,
+    "warmup": 20,
+    "vusers": 8,
+    "api_duration_s": 30,
+    "serverless_max_ops": 300,
+    "tessera_backend": "aws",
+    "tessera_backend_label": "S3DynamoBackend via real AWS",
+    "generated_unix_s": 1791409918.105,
+    "note": "tessera-hot workloads come from a same-day follow-up run (--only tessera-hot) after stale-tenant cleanup; identical rows/batch/warmup, same bucket+table, same backend. cold_first_query_vfs measured again at 2970.8ms in that run.",
+    "tessera_region": "us-east-2"
+  },
+  "tessera_only": {
+    "cold_first_query_vfs_ms": 2243.13
+  },
+  "api": {},
+  "sqlite": {
+    "insert_row": {
+      "p50": 0.020230014342814684,
+      "p95": 0.03203999949619174,
+      "ops_s": 44973.0435440543,
+      "n": 300
+    },
+    "insert_batch": {
+      "p50": 0.2690679975785315,
+      "p95": 0.27332798345014453,
+      "ops_s": 380071.5869768814,
+      "n": 300
+    },
+    "point_select": {
+      "p50": 0.004100031219422817,
+      "p95": 0.0042800093069672585,
+      "ops_s": 239020.58668360446,
+      "n": 300
+    },
+    "update_row": {
+      "p50": 0.01513003371655941,
+      "p95": 0.02422998659312725,
+      "ops_s": 3600.958943926195,
+      "n": 300
+    }
+  },
+  "tessera-hot": {
+    "insert_row": {
+      "p50": 1528.181247995235,
+      "p95": 4126.8662279471755,
+      "ops_s": 0.4959025857267285,
+      "n": 300
+    },
+    "insert_batch": {
+      "p50": 155895.88950801408,
+      "p95": 174623.18685196806,
+      "ops_s": 0.6292928940194915,
+      "n": 300
+    },
+    "point_select": {
+      "p50": 0.5548059707507491,
+      "p95": 0.6545460200868547,
+      "ops_s": 1770.2060326135406,
+      "n": 300
+    },
+    "update_row": {
+      "p50": 1435.2041599922813,
+      "p95": 2212.8455170313828,
+      "ops_s": 0.6584315078760372,
+      "n": 300
+    }
+  },
+  "tessera-store": {
+    "insert_row": {
+      "p50": 1216.331263014581,
+      "p95": 2280.438571004197,
+      "ops_s": 0.6973261775925125,
+      "n": 300
+    },
+    "insert_batch": {
+      "p50": 1401.1420109891333,
+      "p95": 1404.967232956551,
+      "ops_s": 74.0514035581298,
+      "n": 300
+    },
+    "point_select": {
+      "p50": 215.93903499888256,
+      "p95": 315.4933489859104,
+      "ops_s": 4.2418292025160245,
+      "n": 300
+    },
+    "update_row": {
+      "p50": 1202.5626359973103,
+      "p95": 1795.8200130378827,
+      "ops_s": 0.7748713399443989,
+      "n": 300
+    }
+  }
+}

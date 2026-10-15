@@ -1,0 +1,53 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tessera-db"
+version = "2.0.0"
+description = "Open-source SQLite database platform for deployment in your own AWS account"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "korz" }]
+license = "Apache-2.0"
+keywords = ["sqlite", "s3", "multi-tenant", "serverless", "lambda", "object-storage"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Database",
+    "License :: OSI Approved :: Apache Software License",
+]
+
+dependencies = []
+
+[project.optional-dependencies]
+# Page-level VFS reads for format-2 tenants (compiled apsw extension).
+# Without it, v2 reads fall back to full-database hydration.
+vfs = ["apsw>=3.45,<4"]
+# S3DynamoBackend runtime dependencies.
+aws = ["boto3>=1.34"]
+experimental-turso = ["pyturso==0.7.2"]
+bench = ["psycopg2-binary>=2.9", "pymysql>=1.1"]
+# Optional ORM: tessera.orm wraps Store (or the v2 CallbackStore) in
+# SQLAlchemy Sessions. The core does NOT depend on it.
+orm = ["sqlalchemy>=2.0,<3"]
+dev = [
+    "pytest>=8",
+    "pytest-timeout>=2.4",
+    "apsw>=3.45,<4",
+    "boto3>=1.34",
+    "moto[s3,dynamodb]>=5",
+    "sqlalchemy>=2.0,<3",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["tessera"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+timeout = 300
+addopts = "-q"

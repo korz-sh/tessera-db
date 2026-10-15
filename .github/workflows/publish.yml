@@ -1,0 +1,80 @@
+name: Publish
+
+# Publishes the wheel + sdist to PyPI when a `v*` tag is pushed, via OIDC
+# trusted publishing (no stored token). Requires a pending publisher or
+# project configured on PyPI for this repo and this workflow file.
+#
+# `workflow_dispatch` rehearses the build and metadata checks without
+# uploading; only a tag push reaches the upload step.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: The tag must match the code version
+        id: version
+        run: |
+          set -euo pipefail
+          CODE_VERSION=$(python -c "import tomllib,pathlib; print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version'])")
+          echo "version=$CODE_VERSION" >> "$GITHUB_OUTPUT"
+          if [ "${{ github.event_name }}" != "push" ]; then
+            echo "workflow_dispatch: would publish $CODE_VERSION"
+            exit 0
+          fi
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          if [ "$TAG_VERSION" != "$CODE_VERSION" ]; then
+            echo "::error::tag is $TAG_VERSION but pyproject.toml says $CODE_VERSION"
+            exit 1
+          fi
+          grep -q "^__version__ = \"$CODE_VERSION\"" tessera/__init__.py
+      - name: Install
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install -q -e '.[dev,experimental-turso]'
+      - name: Test
+        run: .venv/bin/python -m pytest tests/ -q
+      - name: CHANGELOG entry
+        run: grep -qE "^#+ *\[?${{ steps.version.outputs.version }}\]?" CHANGELOG.md
+      - name: Build
+        run: |
+          .venv/bin/pip install -q build twine
+          .venv/bin/python -m build
+          .venv/bin/twine check dist/*.whl dist/*.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    needs: verify
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: pypi
+      url: https://pypi.org/p/tessera-db
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

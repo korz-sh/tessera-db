@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "stages": {
+    "a1": {
+      "status": "verified",
+      "rollback": "Uninstall the alpha and reinstall the previous pinned wheel; no v2 production data is admitted.",
+      "evidence": {}
+    },
+    "a2": {
+      "status": "verified",
+      "rollback": "Reinstall 2.0.0a1; operation and group formats remain experimental.",
+      "evidence": {
+        "operation-contract": [
+          "openspec/changes/archive/2026-10-06-define-v2-operation-api/verify-report.md",
+          "3ab8080f961c0a5c965b32a38a2b114f1d067f4015d5a7c8bb8ada488b30a840"
+        ],
+        "bounded-runtime": [
+          "openspec/changes/archive/2026-10-06-consolidate-turso-runtime/verify-report.md",
+          "47012e2cc9523206bc627cebd0cf7fb92ae93c9cd4a235cdb7b50acc2f7f5bff"
+        ]
+      }
+    },
+    "a3": {
+      "status": "verified",
+      "rollback": "Stop v2 owners, retain the published frontier, and reinstall the a2 wheel; never reuse a displaced lease.",
+      "evidence": {
+        "authority": [
+          "openspec/changes/archive/2026-10-06-select-v2-durability-authority/verify-report.md",
+          "e73b966f45917a34fdcbd78c570619a4dd37361f9d3c46583cb8b8fcae7dfb5c"
+        ],
+        "native-sealing": [
+          "openspec/changes/archive/2026-10-06-implement-turso-native-sealing/verify-report.md",
+          "c1b863ae05a06ce19c9bb771897dfb5afc2ae01ed6f1c3a711f74f267ba67981"
+        ],
+        "aws-fencing": [
+          "openspec/changes/archive/2026-10-06-prove-live-turso-fencing/verify-report.md",
+          "ece1c564e0baebf73ec3a6d1dff699a70e2d31117b1e2a7f6503caa4cdbcff64"
+        ],
+        "published-reads": [
+          "openspec/changes/archive/2026-10-06-verified-published-frontier-reads/verify-report.md",
+          "55748abb93af4d2a17976812df4cf32d0e1c039aefe1263ad8949c32431b106c"
+        ]
+      }
+    },
+    "b1": {
+      "status": "verified",
+      "rollback": "Remove canary routing and restore from the integrity-checked receipt-frontier export; production enablement remains separate.",
+      "evidence": {
+        "lifecycle": [
+          "openspec/changes/archive/2026-10-06-add-turso-lifecycle/verify-report.md",
+          "9033d869398e27d33cf3c88918ce81df5bd7f576b5aceb7151c8e3e888018417"
+        ],
+        "compatibility": [
+          "openspec/changes/archive/2026-10-06-validate-turso-compatibility/verify-report.md",
+          "bd7716db2ba02dbb0590716a9d35e4f836d3c96031143fae8f945795a9055fd2"
+        ],
+        "operations": [
+          "docs/TURSO-OPERATIONS.md",
+          "dd1b93c1ea71d37155ec2e5523355ec1dc39b9134efd578e23b0aea5f6729c59"
+        ],
+        "consumer-canary": [
+          "docs/consumer-canary-live-2026-09-16.json",
+          "7dfefee2ec671f14994cf82bc7d5f9514e49ae8643ca3ad04bfab67cf24dea07"
+        ]
+      }
+    },
+    "rc1": {
+      "status": "verified",
+      "rollback": "Stop v2 routing, fence owners, and restore each affected group from its integrity-checked receipt-frontier export; do not downgrade a wheel against a newer durable head.",
+      "evidence": {
+        "api-durable-format-freeze": [
+          "docs/V2-CONTRACT-FREEZE.md",
+          "178b1e0d1070e7bdedd55f72e8f9dc068755b72ab31520a02a1ed11db4acadc5"
+        ],
+        "sustained-load-recovery-rollback": [
+          "docs/tessera-v2-rc-drill-2026-10-02.json",
+          "c4493000c0a3734fceb918d1c84236f82cb6ebe077d81b61ac3ee1c01821aae4"
+        ],
+        "process-crash": [
+          "docs/tessera-v2-process-crash-2026-10-02.json",
+          "9ddef7288cd92da23467b10cab62e091fa54669d6653b01a4a761c458a0a6a54"
+        ],
+        "consumer-staging-v2-routing": [
+          "docs/consumer-v2-staging-read-2026-10-02.json",
+          "2f14d16d36c5316805ee743d33f4bc4e6e5715ca0fc8ede287f4e1adc67f593b"
+        ]
+      }
+    },
+    "rc2": {
+      "status": "verified",
+      "rollback": "Stop windowed-mode owners, flush pending publishes, and reinstall rc1; the additive data_version field parses as absent (=version) on older wheels.",
+      "evidence": {
+        "bounded-write-cost-verify": [
+          "openspec/changes/archive/2026-10-08-bounded-write-cost/verify-report.md",
+          "bfb5df48de53b40b2a165a5e68143369daca34bf5fb854c51360dc91a55a24e8"
+        ],
+        "aws-windowed-bench": [
+          "docs/measurements/micro-aws-windowed-2026-10-08.json",
+          "d7538be5ba1a955fa4f507b44f593d2ce3c8d4c4fc9e282e1f025758e202b822"
+        ],
+        "aws-live-gc-and-cost-evidence": [
+          "docs/measurements.md",
+          "af36e0f3a65329134a95a1b02b9caf9c885505fb2d9d388c710c6f7bc0337139"
+        ]
+      }
+    },
+    "stable": {
+      "status": "verified",
+      "rollback": "Return consumers to the last verified RC without rewriting durable state.",
+      "evidence": {
+        "aws-8h-sustained-soak": [
+          "docs/measurements/soak-aws-8h-2026-10-09.json",
+          "4451d809c72bdc300f2592543c9a1dee6f193bfa2dad18dceae153dbfb0b622a"
+        ],
+        "capacity-cost-limits": [
+          "docs/limits.md",
+          "bd9c79a2b2c2d05180489545d820329ebf51a8d11128fe6f305ff90761240ab0"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,409 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  tessera-db reference AWS deployment. Blobs in S3, per-tenant leases in
+  DynamoDB, a Lambda HTTP API (POST /{tenant}/create|write|read) and an
+  EventBridge-scheduled compactor/GC. Build from examples/ (see README.md).
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: tessera
+    Description: Prefix for the bucket, table and function names.
+    AllowedPattern: '^[a-z0-9][a-z0-9-]*$'
+  Stage:
+    Type: String
+    Default: prod
+    Description: Deployment stage suffix.
+    AllowedPattern: '^[a-z0-9][a-z0-9-]*$'
+  EnableEdge:
+    Type: String
+    Default: 'false'
+    AllowedValues: ['true', 'false']
+    Description: >
+      Create a CloudFront distribution in front of the API. Requires the
+      account to be CloudFront-verified (new accounts need an AWS Support
+      "account verification" case first — deploys fail with AccessDenied
+      otherwise).
+  EnableAutoPromote:
+    Type: String
+    Default: 'false'
+    AllowedValues: ['true', 'false']
+    Description: >
+      Under write contention, let the Lambda launch an ephemeral hot owner
+      on Fargate (docs/N-WRITERS-PLAN.md). Requires OwnerImageUri, subnets
+      and a security group allowing the Lambda to reach port 8080.
+  EnableExpress:
+    Type: String
+    Default: 'false'
+    AllowedValues: ['true', 'false']
+    Description: >
+      Route write-once deltas to an S3 Express One Zone directory bucket
+      (single-digit-ms PUTs on the hot write path, measured ~28 ms -> ~7 ms).
+      Deltas are short-lived (compacted into snapshots, then GC'd) so one-AZ
+      durability is a bounded window; manifest/snapshots/chunks stay on
+      standard S3.
+  ApiKeySecretArn:
+    Type: String
+    Default: ''
+    Description: >
+      ARN of a Secrets Manager secret holding the API key. When set, every
+      request must carry the matching X-Tessera-Key header (401 otherwise).
+      Empty leaves the API OPEN — acceptable only for a throwaway stack in a
+      private account (AUTH-PLAN A3). The key is never in the template.
+  ExpressAZ:
+    Type: String
+    Default: use2-az1
+    Description: >
+      Availability Zone ID for the Express directory bucket (must be one
+      where S3 Express is offered in the stack's region, e.g. use2-az1).
+  OwnerImageUri:
+    Type: String
+    Default: ''
+    Description: >
+      Container image for the hot owner (built from examples/owner.Dockerfile).
+      Required when EnableAutoPromote is true.
+  OwnerSubnets:
+    Type: CommaDelimitedList
+    Default: ''
+    Description: Subnets (with a route to the internet) for the owner tasks.
+  OwnerSecurityGroup:
+    Type: String
+    Default: ''
+    Description: Security group for the owner tasks (port 8080 from the Lambda).
+
+Conditions:
+  EdgeEnabled: !Equals [!Ref EnableEdge, 'true']
+  AutoPromoteEnabled: !Equals [!Ref EnableAutoPromote, 'true']
+  ExpressEnabled: !Equals [!Ref EnableExpress, 'true']
+  ApiKeyEnabled: !Not [!Equals [!Ref ApiKeySecretArn, '']]
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 30
+    # 512 MB: MEASURED against the real stack (2026-09-02), not chosen by rule.
+    # The warm write uses ~3.5 ms of CPU and waits ~62 ms on S3, so buying
+    # vCPU does not buy latency — you pay GB-seconds to wait on the network.
+    #   1769 MB: p50 73 ms / p95  87 ms -> $2.10 per 1M writes
+    #    512 MB: p50 76 ms / p95 101 ms -> $0.63 per 1M writes  <-- here
+    #    256 MB: p50 98 ms / p95 168 ms -> $0.41 (degrades, and the peak
+    #            memory used is 111 MB: no headroom for large tenants)
+    # 512 costs 71% less duration for +3 ms of p50. See examples/BENCHMARK.md.
+    MemorySize: 512
+    Architectures:
+      - arm64
+
+Resources:
+  # Object storage: write-once snapshots/deltas + the ONE mutable manifest
+  # per tenant. The library does its own GC; this lifecycle rule is
+  # belt-and-suspenders against orphaned multipart uploads and stale
+  # noncurrent versions if the bucket is ever versioned-cleaned externally.
+  StoreBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: !Sub '${ProjectName}-${Stage}-store-${AWS::AccountId}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: belt-and-suspenders
+            Status: Enabled
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 7
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 30
+
+  # S3 Express One Zone directory bucket for the write-once deltas
+  # (Condition: ExpressEnabled). Naming is imposed by the service:
+  # <base>--<az-id>--x-s3. One AZ only — acceptable for deltas because they
+  # are folded into snapshots at compaction and then GC'd.
+  ExpressBucket:
+    Type: AWS::S3Express::DirectoryBucket
+    Condition: ExpressEnabled
+    DeletionPolicy: Delete
+    Properties:
+      BucketName: !Sub '${ProjectName}-${Stage}-wal--${ExpressAZ}--x-s3'
+      DataRedundancy: SingleAvailabilityZone
+      LocationName: !Ref ExpressAZ
+
+  # Per-tenant leases. Key schema matches S3DynamoBackend (PK tenant_id).
+  # El item del lease NO es descartable: guarda el `epoch`, que es el token de
+  # fencing y no puede retroceder nunca. Por eso el TTL cuelga de `ttl_at` (un
+  # año) y no del vencimiento del lease.
+  LeaseTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    Properties:
+      TableName: !Sub '${ProjectName}-${Stage}-leases'
+      AttributeDefinitions:
+        - AttributeName: tenant_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: tenant_id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+      # El atributo de TTL es `ttl_at`, NO `expires_at`. `expires_at` es el
+      # vencimiento del LEASE (~10 s, y 0 tras un release), asi que usarlo
+      # como TTL hace elegible a TODO item: el sweeper se lleva el lease de
+      # cualquier tenant idle, el epoch vuelve a 1 y el tenant queda
+      # permanentemente no escribible. `ttl_at` va a un año vista y solo
+      # recoge tenants realmente abandonados.
+      TimeToLiveSpecification:
+        AttributeName: ttl_at
+        Enabled: true
+
+  # HTTP API: POST /{tenant}/{op} with op in create|write|read.
+  # CodeUri is this folder (examples/) — run `sam build` from examples/ and
+  # copy the tessera package next to handler.py first (see README.md).
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    DependsOn:
+      - StoreBucket
+      - LeaseTable
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Stage}-api'
+      Handler: handler.handler
+      CodeUri: .
+      Environment:
+        Variables:
+          BUCKET: !Ref StoreBucket
+          TABLE: !Ref LeaseTable
+          REGION: !Ref AWS::Region
+          # S3 Express delta bucket ('' disables the routing in the backend).
+          EXPRESS_BUCKET: !If [ExpressEnabled, !Ref ExpressBucket, '']
+          # Fase 2 (sticky lease): retain the lease across warm invocations
+          # and pair it with a short TTL so a dead sandbox blocks the tenant
+          # for at most 10 s. Set STICKY_LEASE '0' to restore v1.0 behavior.
+          LEASE_TTL_MS: '10000'
+          STICKY_LEASE: '1'
+          STICKY_RETAIN_MS: '5000'
+          # Owner-write forwarding contact budget (ms): how long the write
+          # fast path waits for the hot owner's HTTP answer before failing
+          # open to the normal acquire/hydrate path. See handler.py.
+          OWNER_FORWARD_TIMEOUT_MS: '2000'
+          # Clave de la API (AUTH-PLAN A3). El handler la cachea por sandbox.
+          API_KEY_SECRET_ARN: !Ref ApiKeySecretArn
+          # Auto-promotion (docs/N-WRITERS-PLAN.md); empty unless enabled.
+          AUTO_PROMOTE: !If [AutoPromoteEnabled, '1', '0']
+          # Spot-first (~70% cheaper): interruption is covered by expired
+          # lease + epoch fencing. 'FARGATE' forces on-demand; empty
+          # inherits the cluster's default capacity provider.
+          OWNER_CAPACITY_PROVIDER: 'FARGATE_SPOT'
+          OWNER_CLUSTER: !If [AutoPromoteEnabled, !Ref OwnerCluster, '']
+          OWNER_TASKDEF_ARN: !If [AutoPromoteEnabled, !Ref OwnerTaskDef, '']
+          OWNER_SUBNETS: !If [AutoPromoteEnabled, !Join [',', !Ref OwnerSubnets], '']
+          OWNER_SECURITY_GROUP: !If [AutoPromoteEnabled, !Ref OwnerSecurityGroup, '']
+          OWNER_IDLE_S: '60'
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref StoreBucket
+        - DynamoDBCrudPolicy:
+            TableName: !Ref LeaseTable
+        - !If
+          - ApiKeyEnabled
+          - Statement:
+              - Effect: Allow
+                Action: ['secretsmanager:GetSecretValue']
+                Resource: !Ref ApiKeySecretArn
+          - !Ref AWS::NoValue
+        - !If
+          - ExpressEnabled
+          - Statement:
+              # s3express uses ONE session-scoped action; object ops ride on it.
+              - Effect: Allow
+                Action: ['s3express:CreateSession']
+                Resource: !Sub 'arn:aws:s3express:${AWS::Region}:${AWS::AccountId}:bucket/${ExpressBucket}'
+          - !Ref AWS::NoValue
+        - !If
+          - AutoPromoteEnabled
+          - Statement:
+              - Effect: Allow
+                Action: ['ecs:RunTask']
+                Resource: !Ref OwnerTaskDef
+              - Effect: Allow
+                Action: ['iam:PassRole']
+                Resource:
+                  - !GetAtt OwnerTaskRole.Arn
+                  - !GetAtt OwnerExecutionRole.Arn
+          - !Ref AWS::NoValue
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            Path: /{tenant}/{op}
+            Method: POST
+
+  # --- Ephemeral hot-owner infrastructure (Condition: AutoPromoteEnabled) ---
+  OwnerCluster:
+    Type: AWS::ECS::Cluster
+    Condition: AutoPromoteEnabled
+    Properties:
+      ClusterName: !Sub '${ProjectName}-${Stage}-owners'
+      CapacityProviders: [FARGATE, FARGATE_SPOT]
+
+  OwnerLogGroup:
+    Type: AWS::Logs::LogGroup
+    Condition: AutoPromoteEnabled
+    Properties:
+      LogGroupName: !Sub '/aws/ecs/${ProjectName}-${Stage}-owner'
+      RetentionInDays: 7
+
+  OwnerExecutionRole:
+    Type: AWS::IAM::Role
+    Condition: AutoPromoteEnabled
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: {Service: ecs-tasks.amazonaws.com}
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  OwnerTaskRole:
+    Type: AWS::IAM::Role
+    Condition: AutoPromoteEnabled
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: {Service: ecs-tasks.amazonaws.com}
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: owner-store-access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: ['s3:GetObject', 's3:PutObject', 's3:DeleteObject', 's3:ListBucket']
+                Resource:
+                  - !GetAtt StoreBucket.Arn
+                  - !Sub '${StoreBucket.Arn}/*'
+              - Effect: Allow
+                Action: ['dynamodb:GetItem', 'dynamodb:PutItem', 'dynamodb:UpdateItem', 'dynamodb:DeleteItem']
+                Resource: !GetAtt LeaseTable.Arn
+
+  OwnerTaskDef:
+    Type: AWS::ECS::TaskDefinition
+    Condition: AutoPromoteEnabled
+    Properties:
+      Family: !Sub '${ProjectName}-${Stage}-owner'
+      RequiresCompatibilities: [FARGATE]
+      NetworkMode: awsvpc
+      Cpu: '256'
+      Memory: '512'
+      RuntimePlatform: {CpuArchitecture: X86_64, OperatingSystemFamily: LINUX}  # amd64: the build box has no arm64 emulation
+      ExecutionRoleArn: !GetAtt OwnerExecutionRole.Arn
+      TaskRoleArn: !GetAtt OwnerTaskRole.Arn
+      ContainerDefinitions:
+        - Name: owner
+          Image: !Ref OwnerImageUri
+          Essential: true
+          PortMappings: [{ContainerPort: 8080, Protocol: tcp}]
+          Environment:
+            # TENANT/IDLE_S llegan por containerOverrides del RunTask.
+            - {Name: TESSERA_BUCKET, Value: !Ref StoreBucket}
+            - {Name: TESSERA_TABLE, Value: !Ref LeaseTable}
+            - {Name: TESSERA_REGION, Value: !Ref AWS::Region}
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref OwnerLogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: owner
+
+  # Scheduled housekeeping: GC every tenant and fold delta chains that grew
+  # past the inline-compaction thresholds (covers tenants that stopped
+  # writing before the inline trigger fired).
+  CompactorFunction:
+    Type: AWS::Serverless::Function
+    DependsOn:
+      - StoreBucket
+      - LeaseTable
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${Stage}-compactor'
+      Handler: handler.compactor
+      CodeUri: .
+      Timeout: 300
+      MemorySize: 512
+      Environment:
+        Variables:
+          BUCKET: !Ref StoreBucket
+          TABLE: !Ref LeaseTable
+          REGION: !Ref AWS::Region
+          LEASE_TTL_MS: '60000'
+          EXPRESS_BUCKET: !If [ExpressEnabled, !Ref ExpressBucket, '']
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref StoreBucket
+        - DynamoDBCrudPolicy:
+            TableName: !Ref LeaseTable
+        - !If
+          - ExpressEnabled
+          - Statement:
+              - Effect: Allow
+                Action: ['s3express:CreateSession']
+                Resource: !Sub 'arn:aws:s3express:${AWS::Region}:${AWS::AccountId}:bucket/${ExpressBucket}'
+          - !Ref AWS::NoValue
+      Events:
+        Schedule:
+          Type: Schedule
+          Properties:
+            Schedule: rate(15 minutes)
+            Description: tessera-db per-tenant GC and delta-chain compaction
+
+  # Edge acceleration (Fase "edge" of docs/SERVERLESS-LATENCY-PLAN.md):
+  # CloudFront terminates TLS at the client's nearest POP and keeps warm
+  # connections to the origin over the AWS backbone. Everything is a POST,
+  # so NOTHING is cached (CachingDisabled) — the win is pure transport:
+  # no cross-continent TLS handshake, no TCP slow start per client.
+  # AllViewerExceptHostHeader is required: the origin is API Gateway, which
+  # routes by its own Host.
+  EdgeDistribution:
+    Type: AWS::CloudFront::Distribution
+    Condition: EdgeEnabled
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: !Sub '${ProjectName}-${Stage} edge front for the tenant API'
+        HttpVersion: http2and3
+        PriceClass: PriceClass_All  # includes South America POPs
+        Origins:
+          - Id: api
+            DomainName: !Sub '${ServerlessHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}'
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+              OriginSSLProtocols: [TLSv1.2]
+              OriginKeepaliveTimeout: 60
+              OriginReadTimeout: 30
+        DefaultCacheBehavior:
+          TargetOriginId: api
+          ViewerProtocolPolicy: https-only
+          AllowedMethods: [GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE]
+          # Managed policies: CachingDisabled + AllViewerExceptHostHeader.
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+          OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac
+
+Outputs:
+  ApiUrl:
+    Description: Base URL of the tenant API (append /{tenant}/{op}).
+    Value: !Sub 'https://${ServerlessHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/'
+  EdgeUrl:
+    Description: CloudFront-accelerated base URL of the same API.
+    Condition: EdgeEnabled
+    Value: !Sub 'https://${EdgeDistribution.DomainName}/'
+  BucketName:
+    Description: S3 bucket holding snapshots, deltas and manifests.
+    Value: !Ref StoreBucket
+  TableName:
+    Description: DynamoDB table holding per-tenant leases.
+    Value: !Ref LeaseTable

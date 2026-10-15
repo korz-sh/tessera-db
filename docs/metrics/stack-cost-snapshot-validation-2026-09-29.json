@@ -1,0 +1,95 @@
+{
+  "benchmark_scans": 2,
+  "cleanup_errors": [],
+  "date_utc": "2026-09-29",
+  "lambda_zip_sha256": "05c4a51ea9a63df628962a4fb85c2a53847602813e9a513ace55fd5322f025fc",
+  "region": "us-east-2",
+  "scope": "isolated staging, 2-scan collector validation; not a cost extrapolation",
+  "snapshot": {
+    "cloudwatch_metrics": {
+      "api_data_processed_bytes": {
+        "observed_minutes": 1,
+        "sum": 4548.0,
+        "unit": "Bytes"
+      },
+      "api_log_ingested_bytes": {
+        "observed_minutes": 1,
+        "sum": 962.0,
+        "unit": "Bytes"
+      },
+      "api_requests": {
+        "observed_minutes": 1,
+        "sum": 19.0,
+        "unit": "None"
+      },
+      "dynamodb_gsi_pending-deletions_reads": {
+        "observed_minutes": 0,
+        "sum": null,
+        "unit": "Count"
+      },
+      "dynamodb_gsi_pending-deletions_writes": {
+        "observed_minutes": 1,
+        "sum": 1.0,
+        "unit": "Count"
+      },
+      "dynamodb_table_reads": {
+        "observed_minutes": 1,
+        "sum": 28.0,
+        "unit": "Count"
+      },
+      "dynamodb_table_writes": {
+        "observed_minutes": 1,
+        "sum": 42.0,
+        "unit": "Count"
+      },
+      "lambda_duration_ms": {
+        "observed_minutes": 1,
+        "sum": 7178.7300000000005,
+        "unit": "Milliseconds"
+      },
+      "lambda_invocations": {
+        "observed_minutes": 1,
+        "sum": 18.0,
+        "unit": "Count"
+      },
+      "lambda_log_ingested_bytes": {
+        "observed_minutes": 1,
+        "sum": 15011.0,
+        "unit": "Bytes"
+      }
+    },
+    "dynamodb_pitr_status": "ENABLED",
+    "dynamodb_reported_size": {
+      "freshness": "DescribeTable size and item counts update about every six hours",
+      "indexes": {
+        "pending-deletions": {
+          "bytes": 0,
+          "items": 0
+        }
+      },
+      "table_bytes": 0,
+      "table_items": 0
+    },
+    "limits": [
+      "CloudWatch minute sums may arrive late or underrepresent short spikes",
+      "S3 bytes are a point-in-time inventory, not GB-months or backups",
+      "API DataProcessed combines traffic processed and is not outbound egress",
+      "Lambda Duration is measured execution time, not billed duration; use REPORT logs or billing records for billed GB-seconds",
+      "DynamoDB table and GSI capacity are distinct metrics, not invoice line items"
+    ],
+    "s3_inventory": {
+      "complete": true,
+      "current_bytes": 250544,
+      "current_objects": 131,
+      "list_requests": 1,
+      "stop_reason": null
+    },
+    "window_utc": [
+      "2026-09-29T14:47:00+00:00",
+      "2026-09-29T14:49:00+00:00"
+    ]
+  },
+  "source_commit": "e01c97bc37a86925e7c39cbbba50ff162a5a1d6f",
+  "status": "passed",
+  "terraform_state_empty": true
+}

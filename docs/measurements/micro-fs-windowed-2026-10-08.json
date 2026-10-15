@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "type": "micro",
+    "rows": 60,
+    "batch": 30,
+    "warmup": 20,
+    "vusers": 8,
+    "api_duration_s": 30,
+    "serverless_max_ops": 300,
+    "tessera_backend": "fs",
+    "tessera_backend_label": "LocalBackend (filesystem)",
+    "tessera_publish_mode": "windowed",
+    "tessera_publish_every_s": 2.0,
+    "tessera_backend_ops": {
+      "tessera-hot": {
+        "puts_total": 8,
+        "puts_by_key": {
+          "manifest": 3,
+          "history": 2,
+          "delta": 1,
+          "chunk": 1,
+          "snapshot": 1,
+          "other": 0
+        },
+        "publishes": 3,
+        "gets": 5,
+        "heads": 2,
+        "deletes": 0,
+        "commits": 242,
+        "puts_per_commit": 0.0331,
+        "publishes_per_commit": 0.0124
+      }
+    },
+    "generated_unix_s": 1791426073.138
+  },
+  "tessera_only": {
+    "cold_first_query_vfs_ms": 171.109
+  },
+  "api": {},
+  "tessera-hot": {
+    "insert_row": {
+      "p50": 0.6606539827771485,
+      "p95": 0.7851130212657154,
+      "ops_s": 1493.098792166873,
+      "n": 60
+    },
+    "insert_batch": {
+      "p50": 19.556699960958213,
+      "p95": 19.625029992312193,
+      "ops_s": 1531.325953998413,
+      "n": 60
+    },
+    "point_select": {
+      "p50": 0.5654749693349004,
+      "p95": 0.6337439990602434,
+      "ops_s": 1749.6010131468718,
+      "n": 60
+    },
+    "update_row": {
+      "p50": 0.6644339882768691,
+      "p95": 0.7934029563330114,
+      "ops_s": 1489.4139559959497,
+      "n": 60
+    }
+  }
+}

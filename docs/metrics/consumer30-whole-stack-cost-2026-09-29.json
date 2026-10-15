@@ -1,0 +1,83 @@
+{
+  "date_utc": "2026-09-29",
+  "scope": "Isolated existing-account Ohio deployment from reviewed public source archive; five-minute whole-stack meter window, not a monthly bill",
+  "source_commit": "e50f197c956739450904512cf6d26420615f1b33",
+  "source_archive_sha256": "ffbd5d1d40867dbbc151e05a6509c091ec3d25d8899e56daf707a0951fc0d610",
+  "public_manifest_sha256": "883f94a5d14e1a16912fbe1165680de81e31d20775c9c9fd79667499df5f9187",
+  "lambda_zip_sha256": "a305690b1a4ac366843540dc135ce2e226dbd69d8f3c01958ae1994587e9af4d",
+  "raw_private_report_sha256": "4b01f7351e49446463201f1e536772a38157626a1f19b119999b57c81a90f0fd",
+  "status": "passed",
+  "workload": {
+    "ddl": "consumer repository.sql and attempt_manifest.sql",
+    "scans": 30,
+    "findings_per_scan": 500,
+    "write_statements_per_scan": 1,
+    "sequential_loop_seconds": 160.27514033811167,
+    "scans_per_second": 0.18717812342396264,
+    "write_p50_ms": 1794.2661409033462,
+    "count_read_p50_ms": 2013.9962220564485,
+    "filtered_read_p50_ms": 1519.3649029824883,
+    "fresh_process_recoveries": 5,
+    "fresh_process_recovery_p50_ms": 7370.327
+  },
+  "selected_workload_sdk_telemetry": {
+    "observed_http_samples": 97,
+    "minimum_expected_http_samples": 96,
+    "sdk_http_attempts": {
+      "dynamodb.GetItem": 188,
+      "dynamodb.TransactWriteItems": 31,
+      "dynamodb.UpdateItem": 191,
+      "s3.GetObject": 504,
+      "s3.PutObject": 65
+    },
+    "scope_warning": "This time-based selection includes setup and a forced rollback; it is not an exact 90-request benchmark subset or billed AWS units"
+  },
+  "whole_stack_window_utc": [
+    "2026-09-29T22:01:00+00:00",
+    "2026-09-29T22:06:00+00:00"
+  ],
+  "whole_stack_meters": {
+    "dynamodb_table_read_capacity_units": 203,
+    "dynamodb_table_write_capacity_units": 435,
+    "pending_deletions_gsi_read_capacity_units": 8,
+    "pending_deletions_gsi_write_capacity_units": 0,
+    "dynamodb_capacity_minutes_observed": 5,
+    "api_requests": 102,
+    "api_data_processed_bytes": 20988,
+    "lambda_invocations": 106,
+    "lambda_report_billed_gb_seconds": 55.974,
+    "lambda_log_ingested_bytes": 87450,
+    "api_log_ingested_bytes": 9830,
+    "api_response_payload_bytes": 6586,
+    "api_and_lambda_metric_minutes_observed": 4,
+    "api_and_lambda_metric_minutes_expected": 5,
+    "lambda_report_events": 106,
+    "api_access_log_events": 102,
+    "dynamodb_pitr": "ENABLED"
+  },
+  "s3_point_inventory": {
+    "current_objects": 187,
+    "current_bytes": 8132262,
+    "complete": true,
+    "scope_warning": "Point inventory after workload; not retained GB-months, backup bytes or monthly storage cost"
+  },
+  "limitations": [
+    "CloudWatch API and Lambda series lack one of five minutes; delayed datapoints cannot be assumed zero",
+    "API response payload and DataProcessed are not billed internet egress",
+    "DynamoDB DescribeTable reported zero bytes but size updates about every six hours",
+    "No complete whole-stack S3 operation count, egress meter, retained GB-months, secret API-call count, backup usage or operator cost",
+    "Existing-account installation does not close the fresh-account gate"
+  ],
+  "teardown": {
+    "terraform_state_empty": true,
+    "cleanup_errors": [],
+    "independent_name_prefix_listings_empty": [
+      "s3_buckets",
+      "dynamodb_tables",
+      "lambda_functions",
+      "api_gateway_http_apis",
+      "eventbridge_rules",
+      "secrets_manager_including_pending_deletion"
+    ]
+  }
+}

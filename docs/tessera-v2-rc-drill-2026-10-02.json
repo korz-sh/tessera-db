@@ -1,0 +1,75 @@
+{
+  "kind": "tessera_v2_rc_consumer_drill_v1",
+  "date": "2026-10-02",
+  "account": "REDACTED",
+  "region": "us-east-2",
+  "artifacts": {
+    "tessera_commit": "1822cee8aeff5f36ed727ca7c2cf07a80b1f1d1e",
+    "consumer_commit": "4faf836f15e5763c1f1e7655ade715f31db859be",
+    "pyturso": "0.7.2"
+  },
+  "workload": {
+    "concurrent_repositories": 3,
+    "scans_per_repository": 10,
+    "findings_per_scan": 500,
+    "catalog_repositories": 180,
+    "minimum_load_seconds": 180,
+    "elapsed_seconds": 271.57176576099846
+  },
+  "results": {
+    "catalog_rows": 180,
+    "scan_rows": 30,
+    "finding_rows": 15000,
+    "receipts": 425,
+    "failed": 0,
+    "unknown": 0,
+    "conflicts": 0,
+    "retries": 0,
+    "reconciliations": 0
+  },
+  "faults": {
+    "takeover": {
+      "replacement_epoch": 2,
+      "stale_owner_rejected": true
+    },
+    "lost_response": {
+      "injected_after_commit": true,
+      "ack_reconciled": true
+    }
+  },
+  "recovery": {
+    "cold_recovery_seconds": 6.8930898050002725,
+    "receipts_reconciled": 425
+  },
+  "exports": [
+    {
+      "group": "consumer-catalog",
+      "rows": 30,
+      "version": 30,
+      "sha256": "e56e04a9ee626eee47f3fc6e2f997d5f70524c6286259ce8ea066e4f7c17f466"
+    },
+    {
+      "group": "repo-r-0",
+      "rows": 5000,
+      "version": 130,
+      "sha256": "0bafbd29351f1bfa6e464cf55d4a1f7d347840ed968fe3d335fc8b4094a00160"
+    },
+    {
+      "group": "repo-r-1",
+      "rows": 5000,
+      "version": 130,
+      "sha256": "3c0303c21935b09383f424e7f7f2c053c8ffaf29fb5e50753faca54f579ac2f2"
+    },
+    {
+      "group": "repo-r-2",
+      "rows": 5000,
+      "version": 130,
+      "sha256": "4419d34be6860a9b99d73b9642a9270a65718547366420d4e2625a12672edcdf"
+    }
+  ],
+  "cleanup": {
+    "complete": true,
+    "errors": []
+  },
+  "caveat": "Synthetic consumer-shaped workload in isolated temporary S3/DynamoDB resources; not a production SLO or billing estimate."
+}

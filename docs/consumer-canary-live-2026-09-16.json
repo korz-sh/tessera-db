@@ -1,0 +1,41 @@
+{
+  "account": "REDACTED",
+  "bucket": "tessera-consumer-canary-REDACTED-5cf4d6fa8667",
+  "bucket_created": true,
+  "checks": {
+    "canary": {
+      "api_rows": [
+        [
+          "SUCCESS",
+          "{\"critical\":0}"
+        ]
+      ],
+      "cold_restart_reconciled": true,
+      "receipt_version": 5,
+      "stale_owner_fenced": true
+    },
+    "migration": {
+      "migration_id": "b7d086c8db3be28799864dbfdcb0f077",
+      "rows": 3,
+      "source_hash": "3fe6e6d279231cc36e01db7604a14e8de7636cfc71ae9fc4d01a6564b53ffb13",
+      "source_version": 2,
+      "table_hashes_match": true
+    },
+    "rollback": {
+      "integrity": "ok",
+      "scan_rows": 2,
+      "sha256": "86684b744f11b73068f655e4a00edda0f3d6df37c353ac5a446c246a7da00314"
+    }
+  },
+  "cleanup_complete": true,
+  "cleanup_errors": [],
+  "estimated_max_usd": 0.1,
+  "region": "us-east-2",
+  "table": "tessera-consumer-canary-5cf4d6fa8667",
+  "table_created": true,
+  "tag": {
+    "tessera-experiment": "issue-50-consumer-canary"
+  },
+  "tessera_artifact": "tessera-db@c3717beb307f4cb8f725b4baefc84acaafae516c",
+  "consumer_artifact": "consumer-api@b8f8267de1e8af27d65c8a9be7b0d7b69e3b07f9"
+}

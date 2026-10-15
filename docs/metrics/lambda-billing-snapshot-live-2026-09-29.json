@@ -1,0 +1,95 @@
+{
+  "cleanup_errors": [],
+  "cloudwatch_metrics": {
+    "api_data_processed_bytes": {
+      "complete": false,
+      "expected_minutes": 3,
+      "missing_minutes": 2,
+      "observed_minutes": 1,
+      "sum": 5781.0,
+      "unit": "Bytes"
+    },
+    "api_requests": {
+      "complete": false,
+      "expected_minutes": 3,
+      "missing_minutes": 2,
+      "observed_minutes": 1,
+      "sum": 24.0,
+      "unit": "None"
+    },
+    "dynamodb_table_reads": {
+      "complete": false,
+      "expected_minutes": 3,
+      "missing_minutes": 2,
+      "observed_minutes": 1,
+      "sum": 38.0,
+      "unit": "Count"
+    },
+    "dynamodb_table_writes": {
+      "complete": false,
+      "expected_minutes": 3,
+      "missing_minutes": 2,
+      "observed_minutes": 1,
+      "sum": 77.0,
+      "unit": "Count"
+    },
+    "lambda_duration_ms": {
+      "complete": false,
+      "expected_minutes": 3,
+      "missing_minutes": 2,
+      "observed_minutes": 1,
+      "sum": 9170.340000000002,
+      "unit": "Milliseconds"
+    },
+    "lambda_invocations": {
+      "complete": false,
+      "expected_minutes": 3,
+      "missing_minutes": 2,
+      "observed_minutes": 1,
+      "sum": 25.0,
+      "unit": "Count"
+    }
+  },
+  "collector_commit": "130f21f",
+  "date_utc": "2026-09-29",
+  "independent_active_resource_absence": {
+    "dynamodb_table": true,
+    "lambda_function": true,
+    "s3_bucket": true,
+    "secret": true
+  },
+  "lambda_billing": {
+    "billed_duration_ms": 9507,
+    "billed_gb_seconds": 4.7535,
+    "billed_mb_ms": 4867584,
+    "cloudwatch_invocations": 25.0,
+    "complete_scan": true,
+    "delivery_caveat": "CloudWatch Logs can deliver REPORT events after this scan",
+    "filter_requests": 2,
+    "matches_cloudwatch_invocations": null,
+    "matching_events_unparsed": 0,
+    "memory_mb": [
+      512
+    ],
+    "report_count": 25,
+    "stop_reason": null
+  },
+  "lambda_zip_sha256": "816b249ba1dd523ffbabd008195da28e9441a2a978cdfb890b39a91ac9aca0f9",
+  "region": "us-east-2",
+  "runtime_base_commit": "9502f8543e4357848f9a41b337b4ece285dccbbc",
+  "s3_inventory": {
+    "complete": true,
+    "current_bytes": 329920,
+    "current_objects": 133,
+    "list_requests": 1,
+    "stop_reason": null
+  },
+  "scope": "isolated two-scan synthetic stack in existing Ohio staging account; includes setup and scheduled work",
+  "secret_delete_requested": true,
+  "status": "passed",
+  "terraform_state_empty": true,
+  "window_utc": [
+    "2026-09-29T16:22:00+00:00",
+    "2026-09-29T16:25:00+00:00"
+  ]
+}

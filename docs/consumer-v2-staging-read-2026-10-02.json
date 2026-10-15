@@ -1,0 +1,25 @@
+{
+  "account": "REDACTED",
+  "concurrency": 8,
+  "elapsed_s": 25.61896873400019,
+  "errors": {},
+  "function": "staging-consumer-api",
+  "kind": "consumer_v2_staging_read_benchmark_v1",
+  "latency_ms": {
+    "max": 7667.833452000195,
+    "p50": 966.4811979996557,
+    "p95": 1768.0345720000332,
+    "p99": 7592.913645000408
+  },
+  "measurement": "external direct Lambda invoke; includes Lambda and application time",
+  "path": "/api/repositories",
+  "region": "us-east-2",
+  "requests": 152,
+  "stage": "stage",
+  "started_utc": "2026-10-02T14:33:45.971181+00:00",
+  "successes": 152,
+  "tessera_mode": "v2",
+  "throughput_rps": 5.93310377081156,
+  "warmup": 8,
+  "consumer_version": "stage"
+}

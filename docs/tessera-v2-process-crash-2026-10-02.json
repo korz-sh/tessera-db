@@ -1,0 +1,30 @@
+{
+  "kind": "tessera_v2_process_crash_v1",
+  "date": "2026-10-02",
+  "account": "REDACTED",
+  "region": "us-east-2",
+  "source_commit": "1822cee8aeff5f36ed727ca7c2cf07a80b1f1d1e",
+  "checks": {
+    "before": {
+      "child_exit_signal": "SIGKILL",
+      "durable_receipt_before_retry": false,
+      "recovered_rows_before_retry": 0,
+      "recovery_seconds": 12.402368749000743,
+      "remote_transaction_committed": false,
+      "rows_after_same_id_retry": 1
+    },
+    "after": {
+      "child_exit_signal": "SIGKILL",
+      "durable_receipt_before_retry": true,
+      "recovered_rows_before_retry": 1,
+      "recovery_seconds": 8.173714331000156,
+      "remote_transaction_committed": true,
+      "rows_after_same_id_retry": 1
+    }
+  },
+  "cleanup": {
+    "complete": true,
+    "errors": []
+  },
+  "caveat": "Synthetic isolated resource; validates process-death boundary and same-ID retry idempotency."
+}

@@ -1,0 +1,531 @@
+{
+  "meta": {
+    "duration_s": 28800.0,
+    "elapsed_s": 29968.6,
+    "interrupted": null,
+    "publish_mode": "windowed",
+    "publish_every_s": 1.0,
+    "write_rate": 10.0,
+    "read_rate": 10.0,
+    "backend": "S3DynamoBackend via real AWS",
+    "tenant": "soak-8h-20261009",
+    "drill_every_s": 1200.0
+  },
+  "workload": {
+    "writes_acked": 90189,
+    "reads_issued": 92789,
+    "errors": {},
+    "latency_ms": {
+      "write": {
+        "p50": 1.092,
+        "p95": 1676.361,
+        "p99": 2235.82,
+        "n": 90189
+      },
+      "read": {
+        "p50": 0.94,
+        "p95": 1632.796,
+        "p99": 2169.157,
+        "n": 92789
+      }
+    }
+  },
+  "backend_ops": {
+    "puts_total": 19544,
+    "puts_by_key": {
+      "manifest": 6515,
+      "history": 6514,
+      "delta": 6479,
+      "chunk": 35,
+      "snapshot": 1,
+      "other": 0
+    },
+    "publishes": 6515,
+    "gets": 51358,
+    "heads": 860,
+    "deletes": 0,
+    "commits": 90189,
+    "puts_per_commit": 0.2167,
+    "publishes_per_commit": 0.0722
+  },
+  "objects": [
+    {
+      "objects": 210,
+      "bytes": 10028191,
+      "t": 302.0
+    },
+    {
+      "objects": 422,
+      "bytes": 17452549,
+      "t": 605.0
+    },
+    {
+      "objects": 582,
+      "bytes": 28025467,
+      "t": 905.6
+    },
+    {
+      "objects": 782,
+      "bytes": 34539067,
+      "t": 1283.1
+    },
+    {
+      "objects": 924,
+      "bytes": 45261827,
+      "t": 1584.6
+    },
+    {
+      "objects": 1069,
+      "bytes": 48941213,
+      "t": 1887.4
+    },
+    {
+      "objects": 1242,
+      "bytes": 54822884,
+      "t": 2188.4
+    },
+    {
+      "objects": 1403,
+      "bytes": 65674790,
+      "t": 2766.3
+    },
+    {
+      "objects": 1610,
+      "bytes": 72234165,
+      "t": 3085.0
+    },
+    {
+      "objects": 1782,
+      "bytes": 84330428,
+      "t": 3389.8
+    },
+    {
+      "objects": 1988,
+      "bytes": 90633459,
+      "t": 3691.0
+    },
+    {
+      "objects": 2150,
+      "bytes": 106217453,
+      "t": 3992.2
+    },
+    {
+      "objects": 2364,
+      "bytes": 112432771,
+      "t": 4295.3
+    },
+    {
+      "objects": 2536,
+      "bytes": 118130296,
+      "t": 4596.7
+    },
+    {
+      "objects": 2648,
+      "bytes": 126890931,
+      "t": 4899.3
+    },
+    {
+      "objects": 2802,
+      "bytes": 131311303,
+      "t": 5261.0
+    },
+    {
+      "objects": 2974,
+      "bytes": 143499967,
+      "t": 5564.6
+    },
+    {
+      "objects": 3181,
+      "bytes": 149382926,
+      "t": 5867.1
+    },
+    {
+      "objects": 3396,
+      "bytes": 156963306,
+      "t": 6181.2
+    },
+    {
+      "objects": 3579,
+      "bytes": 168243472,
+      "t": 7189.1
+    },
+    {
+      "objects": 3815,
+      "bytes": 182417925,
+      "t": 7557.3
+    },
+    {
+      "objects": 4037,
+      "bytes": 188883972,
+      "t": 7859.5
+    },
+    {
+      "objects": 4222,
+      "bytes": 201630377,
+      "t": 8162.2
+    },
+    {
+      "objects": 4429,
+      "bytes": 211478939,
+      "t": 8465.2
+    },
+    {
+      "objects": 4650,
+      "bytes": 218059720,
+      "t": 8768.2
+    },
+    {
+      "objects": 4836,
+      "bytes": 231013929,
+      "t": 9069.8
+    },
+    {
+      "objects": 5061,
+      "bytes": 237550945,
+      "t": 9374.3
+    },
+    {
+      "objects": 5247,
+      "bytes": 249875186,
+      "t": 9678.6
+    },
+    {
+      "objects": 5469,
+      "bytes": 256302536,
+      "t": 9980.9
+    },
+    {
+      "objects": 5591,
+      "bytes": 259808158,
+      "t": 10288.8
+    },
+    {
+      "objects": 5715,
+      "bytes": 269293819,
+      "t": 10603.6
+    },
+    {
+      "objects": 5851,
+      "bytes": 272037794,
+      "t": 12152.3
+    },
+    {
+      "objects": 6069,
+      "bytes": 279692377,
+      "t": 12456.0
+    },
+    {
+      "objects": 6241,
+      "bytes": 290678561,
+      "t": 12759.9
+    },
+    {
+      "objects": 6487,
+      "bytes": 299093319,
+      "t": 13101.6
+    },
+    {
+      "objects": 6655,
+      "bytes": 314334570,
+      "t": 13404.1
+    },
+    {
+      "objects": 6879,
+      "bytes": 320901882,
+      "t": 13707.9
+    },
+    {
+      "objects": 7070,
+      "bytes": 327732182,
+      "t": 14011.2
+    },
+    {
+      "objects": 7257,
+      "bytes": 339311503,
+      "t": 14314.3
+    },
+    {
+      "objects": 7443,
+      "bytes": 345519869,
+      "t": 14685.6
+    },
+    {
+      "objects": 7623,
+      "bytes": 357031748,
+      "t": 14994.3
+    },
+    {
+      "objects": 7819,
+      "bytes": 363328472,
+      "t": 15300.5
+    },
+    {
+      "objects": 7987,
+      "bytes": 374817919,
+      "t": 15603.8
+    },
+    {
+      "objects": 8202,
+      "bytes": 381439868,
+      "t": 17601.5
+    },
+    {
+      "objects": 8383,
+      "bytes": 393621905,
+      "t": 17904.8
+    },
+    {
+      "objects": 8638,
+      "bytes": 401609841,
+      "t": 18260.3
+    },
+    {
+      "objects": 8823,
+      "bytes": 413562036,
+      "t": 18563.8
+    },
+    {
+      "objects": 9011,
+      "bytes": 423385615,
+      "t": 18869.4
+    },
+    {
+      "objects": 9199,
+      "bytes": 428545521,
+      "t": 19174.9
+    },
+    {
+      "objects": 9398,
+      "bytes": 435476973,
+      "t": 19478.9
+    },
+    {
+      "objects": 9593,
+      "bytes": 447110658,
+      "t": 19783.2
+    },
+    {
+      "objects": 9781,
+      "bytes": 453522630,
+      "t": 20139.6
+    },
+    {
+      "objects": 9967,
+      "bytes": 465316823,
+      "t": 20450.6
+    },
+    {
+      "objects": 10169,
+      "bytes": 471926481,
+      "t": 20755.0
+    },
+    {
+      "objects": 10339,
+      "bytes": 483457434,
+      "t": 21058.8
+    },
+    {
+      "objects": 10555,
+      "bytes": 490188027,
+      "t": 23526.2
+    },
+    {
+      "objects": 10739,
+      "bytes": 502514554,
+      "t": 23831.9
+    },
+    {
+      "objects": 10961,
+      "bytes": 509321420,
+      "t": 24135.7
+    },
+    {
+      "objects": 11151,
+      "bytes": 521582809,
+      "t": 24440.0
+    },
+    {
+      "objects": 11367,
+      "bytes": 532295871,
+      "t": 24762.8
+    },
+    {
+      "objects": 11591,
+      "bytes": 538744497,
+      "t": 25067.4
+    },
+    {
+      "objects": 11780,
+      "bytes": 545420574,
+      "t": 25371.6
+    },
+    {
+      "objects": 12004,
+      "bytes": 557976159,
+      "t": 25677.0
+    },
+    {
+      "objects": 12195,
+      "bytes": 569924478,
+      "t": 25989.7
+    },
+    {
+      "objects": 12421,
+      "bytes": 576437472,
+      "t": 26294.5
+    },
+    {
+      "objects": 12613,
+      "bytes": 589140727,
+      "t": 26600.0
+    },
+    {
+      "objects": 12831,
+      "bytes": 595464881,
+      "t": 26906.2
+    },
+    {
+      "objects": 13028,
+      "bytes": 602465215,
+      "t": 29968.6
+    }
+  ],
+  "drills": {
+    "failovers": [
+      {
+        "kind": "failover",
+        "epoch_before": 2,
+        "epoch_after": 3,
+        "elapsed_s": 81.824
+      },
+      {
+        "kind": "failover",
+        "epoch_before": 3,
+        "epoch_after": 4,
+        "elapsed_s": 83.816
+      },
+      {
+        "kind": "failover",
+        "epoch_before": 4,
+        "epoch_after": 5,
+        "elapsed_s": 11.987
+      },
+      {
+        "kind": "failover",
+        "epoch_before": 5,
+        "epoch_after": 6,
+        "elapsed_s": 102.291
+      },
+      {
+        "kind": "failover",
+        "epoch_before": 6,
+        "epoch_after": 7,
+        "elapsed_s": 98.641
+      },
+      {
+        "kind": "failover",
+        "epoch_before": 7,
+        "epoch_after": 8,
+        "elapsed_s": 26.39
+      }
+    ],
+    "gc_sweeps": [
+      {
+        "kind": "gc",
+        "objects_before": 1400,
+        "objects_after": 1402,
+        "deleted": 0,
+        "history_pruned": 0,
+        "elapsed_s": 283.254
+      },
+      {
+        "kind": "gc",
+        "objects_before": 3577,
+        "objects_after": 3578,
+        "deleted": 0,
+        "history_pruned": 0,
+        "elapsed_s": 728.14
+      },
+      {
+        "kind": "gc",
+        "objects_before": 5849,
+        "objects_after": 5850,
+        "deleted": 0,
+        "history_pruned": 0,
+        "elapsed_s": 1226.249
+      },
+      {
+        "kind": "gc",
+        "objects_before": 8199,
+        "objects_after": 8200,
+        "deleted": 0,
+        "history_pruned": 0,
+        "elapsed_s": 1704.92
+      },
+      {
+        "kind": "gc",
+        "objects_before": 10552,
+        "objects_after": 10552,
+        "deleted": 0,
+        "history_pruned": 0,
+        "elapsed_s": 2173.381
+      },
+      {
+        "kind": "gc",
+        "objects_before": 13027,
+        "objects_after": 13028,
+        "deleted": 0,
+        "history_pruned": 0,
+        "elapsed_s": 2732.543
+      }
+    ],
+    "compactions": [
+      {
+        "kind": "compact",
+        "version_before": 14967,
+        "version_after": 14971,
+        "data_version_regression": false,
+        "elapsed_s": 7.256
+      },
+      {
+        "kind": "compact",
+        "version_before": 30622,
+        "version_after": 30634,
+        "data_version_regression": false,
+        "elapsed_s": 26.068
+      },
+      {
+        "kind": "compact",
+        "version_before": 45888,
+        "version_after": 45896,
+        "data_version_regression": false,
+        "elapsed_s": 19.761
+      },
+      {
+        "kind": "compact",
+        "version_before": 62431,
+        "version_after": 62440,
+        "data_version_regression": false,
+        "elapsed_s": 38.897
+      },
+      {
+        "kind": "compact",
+        "version_before": 78995,
+        "version_after": 79005,
+        "data_version_regression": false,
+        "elapsed_s": 37.569
+      }
+    ],
+    "watchdog_restarts": []
+  },
+  "violations": [],
+  "lost_unpublished": [],
+  "unverified": [],
+  "cost_derived": {
+    "label": "derived",
+    "puts": 19544,
+    "gets": 51358,
+    "deletes": 0,
+    "note": "op counts measured; prices are published AWS rates applied to counts \u2014 never measured billing"
+  }
+}

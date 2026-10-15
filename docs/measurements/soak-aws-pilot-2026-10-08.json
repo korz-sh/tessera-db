@@ -1,0 +1,114 @@
+{
+  "meta": {
+    "duration_s": 120.0,
+    "elapsed_s": 394.6,
+    "publish_mode": "windowed",
+    "publish_every_s": 1.0,
+    "write_rate": 10.0,
+    "read_rate": 10.0,
+    "backend": "S3DynamoBackend via real AWS",
+    "tenant": "soak-1791472150",
+    "drill_every_s": 40.0
+  },
+  "workload": {
+    "writes_acked": 413,
+    "reads_issued": 416,
+    "errors": {
+      "read_http_503": 1
+    },
+    "latency_ms": {
+      "write": {
+        "p50": 1.274,
+        "p95": 1760.117,
+        "p99": 2960.981,
+        "n": 413
+      },
+      "read": {
+        "p50": 1.04,
+        "p95": 1745.724,
+        "p99": 2960.473,
+        "n": 417
+      }
+    }
+  },
+  "backend_ops": {
+    "puts_total": 119,
+    "puts_by_key": {
+      "manifest": 40,
+      "history": 39,
+      "delta": 38,
+      "chunk": 1,
+      "snapshot": 1,
+      "other": 0
+    },
+    "publishes": 40,
+    "gets": 250,
+    "heads": 421,
+    "deletes": 0,
+    "commits": 413,
+    "puts_per_commit": 0.2881,
+    "publishes_per_commit": 0.0969
+  },
+  "objects": [
+    {
+      "objects": 18,
+      "bytes": 4550091,
+      "t": 20.6
+    },
+    {
+      "objects": 34,
+      "bytes": 4909845,
+      "t": 43.9
+    },
+    {
+      "objects": 48,
+      "bytes": 5270115,
+      "t": 64.1
+    },
+    {
+      "objects": 60,
+      "bytes": 5554821,
+      "t": 92.7
+    },
+    {
+      "objects": 74,
+      "bytes": 5902168,
+      "t": 113.0
+    },
+    {
+      "objects": 80,
+      "bytes": 6020135,
+      "t": 394.6
+    }
+  ],
+  "drills": {
+    "failovers": [
+      {
+        "kind": "failover",
+        "epoch_before": 2,
+        "epoch_after": 3,
+        "elapsed_s": 3.591
+      }
+    ],
+    "gc_sweeps": [
+      {
+        "kind": "gc",
+        "objects_before": 58,
+        "objects_after": 60,
+        "deleted": 0,
+        "history_pruned": 0,
+        "elapsed_s": 8.807
+      }
+    ],
+    "compactions": []
+  },
+  "violations": [],
+  "lost_unpublished": [],
+  "cost_derived": {
+    "label": "derived",
+    "puts": 119,
+    "gets": 250,
+    "deletes": 0,
+    "note": "op counts measured; prices are published AWS rates applied to counts \u2014 never measured billing"
+  }
+}
