@@ -60,6 +60,34 @@ numbers come from a same-day follow-up run (`--only tessera-hot`) after
 stale-tenant cleanup; identical parameters, bucket and table — noted in the
 artifact's `meta.note`.
 
+### Final-engine run — measured (2026-10-15, WAN client, us-east-2)
+
+Same workload (300 rows, batch 100) on the released `2.0.0` engine with
+the publish-path improvements (2 RTTs per publish instead of 4, cached
+manifest, transient publish retry, bounded parallel hydration):
+
+| Workload | Engine | `per_commit` p50 ms | `windowed` p50 ms | Label |
+|---|---|---:|---:|---|
+| insert_row | tessera-hot | **1,102.5** | **0.68** | measured |
+| insert_batch (per batch) | tessera-hot | 157,257.5 | **65.9** | measured |
+| point_select | tessera-hot | 0.56 | 0.56 | measured |
+| update_row | tessera-hot | 1,509.6 | **0.64** | measured |
+| insert_row | tessera-store | 1,441.4 | 1,373.1 | measured |
+| cold_first_query_vfs | — | 3,809.9 | **2,085.3** | measured |
+
+`per_commit` insert_row improved **1,528 → 1,102 ms (−28%)** — the two
+removed manifest GETs dropped exactly the predicted ~2 RTTs. WAN
+conditions on this day were noisier (p95s up across the board), so
+`tessera-store` and the `per_commit` cold-read cells regressed slightly
+within run-to-run WAN variance. Under `windowed` the engine folded
+963 commits into **3 publishes / 8 PUTs (0.0083 PUTs/commit)** —
+the write-cost contract is unchanged on the final engine, and the
+windowed cold read improved (parallel hydration).
+
+Artifacts: [`micro-aws-2026-10-15.json`](measurements/micro-aws-2026-10-15.json),
+[`micro-aws-windowed-2026-10-15.json`](measurements/micro-aws-windowed-2026-10-15.json),
+[`micro-fs-2026-10-15.json`](measurements/micro-fs-2026-10-15.json).
+
 Reproduce:
 
 ```bash

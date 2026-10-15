@@ -16,10 +16,16 @@ their honest limits live in [Guarantees](GUARANTEES.html).
 One tenant has exactly one writer at a time — the lease is the fencing
 token, not a performance knob.
 
+The two publish modes are different **durability classes**, so compare
+them against the right baseline: `per_commit` competes with synchronous
+remote commits (RDS/Aurora-style — one network round trip per durable
+commit), while `windowed` competes with local WAL commits (the engine's
+SQLite layer is not the bottleneck — publish amortization is).
+
 | Publish mode | Write latency | Effective ceiling | Label |
 |---|---|---|---|
-| `per_commit` (default) | one S3+delta+manifest CAS round-trip per write — p50 **1,528 ms** over WAN, **117.8 ms** in-region | ~0.7 writes/s WAN, ~8.5 writes/s in-region | measured |
-| `windowed` (opt-in) | local WAL commit — p50 **0.68 ms** measured over WAN | bounded by local commit rate, not network; hundreds of commits per publish window | measured |
+| `per_commit` (default) | one delta+manifest CAS round-trip per write — p50 **1,102 ms** over WAN (2026-10-15), **117.8 ms** in-region (2026-10-07) | ~0.9 writes/s WAN, ~8.5 writes/s in-region | measured |
+| `windowed` (opt-in) | local WAL commit — p50 **0.68 ms**, **~1,460 writes/s** measured over WAN against real S3 (2026-10-15) | bounded by local commit rate, not network; hundreds of commits per publish window | measured |
 
 `windowed` trades a bounded durability window for that throughput: a write
 is acked at local commit and becomes durable at the next publish
@@ -33,7 +39,7 @@ open window — never a write acknowledged `version <= published`.
 |---|---|---|
 | warm owner `POST /read` | p50 **0.55 ms** (SQLite-local; never touches the network) | measured |
 | independent `Store.read`, warm cache | one manifest HEAD + local data | measured |
-| cold first read (S3 hydration) | ~**2.2 s** for a small tenant; scales with downloaded bytes | measured |
+| cold first read (S3 hydration) | ~**2.1 s** for a small tenant; scales with downloaded bytes | measured |
 
 Cold reads historically downloaded ~4.2 MB for ~200 KB of logical data —
 chunked VFS + incremental compaction bound that to live pages plus the
@@ -49,7 +55,7 @@ first tier, no free tier). Inputs are measured; the dollar figures are
 
 | Workload | Backend ops | Derived cost |
 |---|---|---|
-| 1M writes, `per_commit` | ~3.0 PUTs + 1 GET per write | ~**$15.5** |
+| 1M writes, `per_commit` | ~3.0 PUTs + 0 GETs per write (manifest cached; measured 2026-10-15) | ~**$15** |
 | 1M writes, `windowed` (2 s window) | **0.0083 PUTs** per commit — measured on S3 | ~**$0.043** |
 | warm reads | 0 object ops (local SQLite) | ~$0 |
 | cold reads | 1 HEAD warm + hydration GETs once | cents |
