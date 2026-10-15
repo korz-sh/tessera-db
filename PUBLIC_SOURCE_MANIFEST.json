@@ -3,6 +3,7 @@
     ".github/workflows/ci.yml": "5962f3b1f0a7874eae9d92cb914a68cd0a47f35be35f825faf594c9364a00a6f",
     ".github/workflows/pages.yml": "d1dc79b4db28fb9b8460ad088ece53258c7870ef0def22551af3aaa358c2ddd3",
     ".github/workflows/publish.yml": "2b6a779ecc5c1698112546a7e4a9da2042cce9109a2b56fe1d16f2454497d842",
+    ".gitignore": "124672c8361e88e46c0bcbc9c9629f28a186f24fdca1e93fd349e0822fdfc413",
     "CHANGELOG.md": "a86be3bf745709d677d7e47b084efb2bee957d4209c80075aa69497e53b74cfa",
     "CODE_OF_CONDUCT.md": "3d5c4719723995fc9460302d932437e54268a42c234f47efacc2d3c052199cbd",
     "CONTRIBUTING.md": "02f127c87aa66a4e957e28837756d8d4660d4dccac1cbc59297157b48b7cdb2c",
